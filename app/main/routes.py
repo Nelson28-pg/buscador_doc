@@ -3,7 +3,7 @@
 """
 Define las rutas principales de la aplicación (búsqueda, carga, etc.).
 """
-from flask import render_template, request, jsonify, send_file, session, current_app, make_response
+from flask import render_template, request, jsonify, send_file, session, current_app
 from functools import wraps
 from . import main_bp
 from app.auth.routes import login_required
@@ -15,6 +15,7 @@ import logging
 from datetime import datetime
 import io
 import csv
+import json # Importar el módulo json
 
 # Obtiene el logger configurado en la factory de la aplicación
 logger = logging.getLogger(__name__)
@@ -31,20 +32,32 @@ def nocache(view):
         return response
     return no_cache
 
-# --- Datos de Ejemplo y Variables Globales ---
+# --- Datos Internos y Variables Globales ---
+# Ruta al archivo JSON de datos internos
+DATA_FILE_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'data.json')
+
+INTERNAL_DATA = []
+try:
+    with open(DATA_FILE_PATH, 'r', encoding='utf-8') as f:
+        INTERNAL_DATA = json.load(f)
+    logger.info(f"Datos internos cargados desde {DATA_FILE_PATH}: {len(INTERNAL_DATA)} registros.")
+except FileNotFoundError:
+    logger.warning(f"Archivo de datos internos no encontrado en {DATA_FILE_PATH}. Usando datos de ejemplo.")
+    # Fallback a datos de ejemplo si el archivo no se encuentra
+    INTERNAL_DATA = [
+        {"nombre": "Contrato de Servicio B", "tipo": "ruc", "id": "DOC002", "contenido": "024 contrato servicio prestación", "fecha": "2024-01-15", "estado": "activo"},
+        {"nombre": "Factura #12345", "tipo": "obligado", "id": "DOC004", "contenido": "024 factura número doce mil", "fecha": "2024-02-10", "estado": "procesado"}
+    ]
+except json.JSONDecodeError as e:
+    logger.error(f"Error al decodificar JSON en {DATA_FILE_PATH}: {e}. Usando datos de ejemplo.")
+    INTERNAL_DATA = [
+        {"nombre": "Contrato de Servicio B", "tipo": "ruc", "id": "DOC002", "contenido": "024 contrato servicio prestación", "fecha": "2024-01-15", "estado": "activo"},
+        {"nombre": "Factura #12345", "tipo": "obligado", "id": "DOC004", "contenido": "024 factura número doce mil", "fecha": "2024-02-10", "estado": "procesado"}
+    ]
+
+# El historial no es específico de la sesión en esta implementación.
 search_history = []
 upload_history = []
-
-SAMPLE_DATA = [
-    {
-        "nombre": "Contrato de Servicio B", "tipo": "ruc", "id": "DOC002",
-        "contenido": "024 contrato servicio prestación", "fecha": "2024-01-15", "estado": "activo"
-    },
-    {
-        "nombre": "Factura #12345", "tipo": "obligado", "id": "DOC004",
-        "contenido": "024 factura número doce mil", "fecha": "2024-02-10", "estado": "procesado"
-    }
-]
 
 # --- Rutas Principales ---
 @main_bp.route('/')
@@ -110,7 +123,7 @@ def search():
         'query': query, 'timestamp': datetime.now().isoformat(), 'user': session.get('user')
     })
 
-    data_to_search = session.get('excel_data', []) if data_source == 'excel' else SAMPLE_DATA
+    data_to_search = session.get('excel_data', []) if data_source == 'excel' else INTERNAL_DATA
     
     results = []
     for item in data_to_search:
@@ -138,7 +151,7 @@ def status():
         'has_excel_data': 'excel_data' in session,
         'filename': session.get('current_filename', ''),
         'records': len(session.get('excel_data', [])),
-        'sample_records': len(SAMPLE_DATA)
+        'sample_records': len(INTERNAL_DATA) # Usar INTERNAL_DATA aquí
     })
 
 # --- Funciones de Utilidad ---
