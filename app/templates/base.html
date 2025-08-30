@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<!-- app/templates/base.html -->
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- El título puede ser sobreescrito por las plantillas hijas -->
+    <title>{% block title %}Buscador de Documentos{% endblock %}</title>
+    
+    <!-- Enlaces a CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Bloque para añadir CSS o scripts adicionales en el head -->
+    {% block head_extra %}{% endblock %}
+</head>
+<!-- El body puede tener clases adicionales, como en la página de login -->
+<body class="dark-mode {% block body_class %}{% endblock %}" id="body">
+    
+    <!-- El contenido principal de cada página se insertará aquí -->
+    {% block content %}{% endblock %}
+
+    <!-- Scripts globales. El de la app principal se carga al final -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

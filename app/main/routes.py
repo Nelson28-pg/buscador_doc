@@ -1,0 +1,147 @@
+# app/main/routes.py
+# -*- coding: utf-8 -*-
+"""
+Define las rutas principales de la aplicación (búsqueda, carga, etc.).
+"""
+from flask import render_template, request, jsonify, send_file, session, current_app, make_response
+from functools import wraps
+from . import main_bp
+from app.auth.routes import login_required
+from app.auth.models import users
+import pandas as pd
+import os
+from werkzeug.utils import secure_filename
+import logging
+from datetime import datetime
+import io
+import csv
+
+# Obtiene el logger configurado en la factory de la aplicación
+logger = logging.getLogger(__name__)
+
+# --- Decoradores Específicos del Módulo ---
+def nocache(view):
+    """Decorador para evitar que una vista se guarde en la caché del navegador."""
+    @wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+    return no_cache
+
+# --- Datos de Ejemplo y Variables Globales ---
+search_history = []
+upload_history = []
+
+SAMPLE_DATA = [
+    {
+        "nombre": "Contrato de Servicio B", "tipo": "ruc", "id": "DOC002",
+        "contenido": "024 contrato servicio prestación", "fecha": "2024-01-15", "estado": "activo"
+    },
+    {
+        "nombre": "Factura #12345", "tipo": "obligado", "id": "DOC004",
+        "contenido": "024 factura número doce mil", "fecha": "2024-02-10", "estado": "procesado"
+    }
+]
+
+# --- Rutas Principales ---
+@main_bp.route('/')
+@login_required
+@nocache
+def index():
+    """Renderiza la página principal de la aplicación."""
+    username = session.get('user')
+    user_details = users.get(username, {})
+    user_name = user_details.get('name', 'Usuario')
+    return render_template('main/index.html', user_name=user_name)
+
+@main_bp.route('/upload', methods=['POST'])
+@login_required
+def upload_file():
+    """Maneja la carga y procesamiento de archivos Excel."""
+    if 'file' not in request.files:
+        return jsonify({'error': 'No se seleccionó archivo'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No se seleccionó archivo'}), 400
+    
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], f"{datetime.now().strftime('%Y%m%d_%H%M%S')}_{filename}")
+        
+        try:
+            file.save(filepath)
+            df = pd.read_excel(filepath, engine='openpyxl')
+            df = df.dropna(how='all').fillna('')
+            
+            session['excel_data'] = df.to_dict('records')
+            session['current_filename'] = file.filename
+            
+            upload_history.append({
+                'filename': file.filename, 'timestamp': datetime.now().isoformat(),
+                'records': len(session['excel_data']), 'user': session.get('user')
+            })
+            
+            os.remove(filepath)
+            return jsonify({'success': True, 'filename': file.filename, 'records': len(session['excel_data'])})
+            
+        except Exception as e:
+            logger.error(f"Error procesando archivo para {session.get('user')}: {e}")
+            if os.path.exists(filepath): os.remove(filepath)
+            return jsonify({'error': f'Error al leer el archivo: {str(e)}'}), 400
+    
+    return jsonify({'error': 'Tipo de archivo no permitido'}), 400
+
+@main_bp.route('/search', methods=['POST'])
+@login_required
+def search():
+    """Ejecuta una búsqueda sobre los datos internos o el archivo cargado."""
+    data = request.get_json()
+    query = data.get('query', '').lower().strip()
+    data_source = data.get('dataSource', 'internal')
+
+    if not query:
+        return jsonify({'results': [], 'query': query})
+
+    search_history.append({
+        'query': query, 'timestamp': datetime.now().isoformat(), 'user': session.get('user')
+    })
+
+    data_to_search = session.get('excel_data', []) if data_source == 'excel' else SAMPLE_DATA
+    
+    results = []
+    for item in data_to_search:
+        if any(query in str(value).lower() for value in item.values()):
+            results.append(item)
+            
+    return jsonify({
+        'results': results, 'query': query,
+        'is_excel_data': data_source == 'excel', 'total_records': len(data_to_search)
+    })
+
+@main_bp.route('/clear', methods=['POST'])
+@login_required
+def clear_data():
+    """Limpia los datos de Excel de la sesión del usuario."""
+    session.pop('excel_data', None)
+    session.pop('current_filename', None)
+    return jsonify({'success': True})
+
+@main_bp.route('/status')
+@login_required
+def status():
+    """Devuelve el estado actual de los datos del usuario."""
+    return jsonify({
+        'has_excel_data': 'excel_data' in session,
+        'filename': session.get('current_filename', ''),
+        'records': len(session.get('excel_data', [])),
+        'sample_records': len(SAMPLE_DATA)
+    })
+
+# --- Funciones de Utilidad ---
+def allowed_file(filename):
+    """Verifica si la extensión del archivo es permitida."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'xlsx', 'xls', 'csv'}

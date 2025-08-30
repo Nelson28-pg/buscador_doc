@@ -1,0 +1,192 @@
+/* app/static/css/style.css */
+
+/* --- Variables Globales de Diseño --- */
+:root {
+    --primary-color: #3b82f6;
+    --secondary-color: #8b5cf6;
+    --cyan-color: #06b6d4;
+    --neon-celeste: #00d9ff;
+    --plomo-oscuro: #4a4a4a;
+    --bg-dark-1: #1e293b;
+    --bg-dark-2: #334155;
+    --bg-dark-curtain: #111827; /* Fondo más oscuro para la cortina */
+    --bg-light-1: #f1f5f9;
+    --bg-light-2: #ffffff;
+    --text-dark: #1e293b;
+    --text-light: #f1f5f9;
+    --border-dark: rgba(6, 182, 212, 0.3);
+    --border-light: #e2e8f0;
+    --flower-color-1: #8b5cf6;
+    --flower-color-2: #3b82f6;
+}
+
+/* --- Estilos Base --- */
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif; 
+    transition: all 0.3s ease; 
+    min-height: 100vh; 
+}
+
+.dark-mode { 
+    background: linear-gradient(135deg, var(--bg-dark-1), var(--bg-dark-2)); 
+    color: var(--text-light); 
+}
+
+.light-mode { 
+    background: linear-gradient(135deg, var(--bg-light-1), var(--bg-light-2)); 
+    color: var(--text-dark); 
+}
+
+/* --- Cortina de Bienvenida --- */
+body.curtain-active {
+    overflow: hidden;
+}
+
+.welcome-curtain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--bg-dark-curtain);
+    z-index: 1000;
+    opacity: 0;
+    animation: curtainFadeIn 0.5s ease-out forwards;
+}
+
+.welcome-curtain.hide {
+    animation: curtainFadeOut 0.8s ease-in forwards;
+}
+
+.welcome-title {
+    position: absolute;
+    top: 15%;
+    left: 10%;
+    width: 80%;
+    z-index: 10;
+    opacity: 0;
+    animation: contentFadeIn 1s ease-out 0.5s forwards;
+    font-size: 3.5rem;
+    text-align: left;
+}
+
+.welcome-subtitle {
+    position: absolute;
+    top: 55%;
+    left: 10%;
+    transform: translateY(-50%);
+    width: 80%;
+    z-index: 10;
+    opacity: 0;
+    animation: contentFadeIn 1s ease-out 1s forwards;
+    font-size: 1.25rem;
+    max-width: 650px;
+    color: var(--text-light);
+    text-align: left;
+    line-height: 1.6;
+}
+
+/* --- Animación de Flores --- */
+.flower-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; }
+.flower { position: absolute; width: 50px; height: 50px; opacity: 0; animation: growFlower 10s ease-out forwards; }
+.flower::before, .flower::after { content: ''; position: absolute; background-color: var(--flower-color-1); border-radius: 50%; }
+.flower::before { width: 100%; height: 100%; left: -25px; }
+.flower::after { width: 100%; height: 100%; top: -25px; }
+.flower:nth-child(2n) { animation-delay: 0.5s; }
+.flower:nth-child(2n)::before, .flower:nth-child(2n)::after { background-color: var(--flower-color-2); }
+.flower:nth-child(3n) { animation-delay: 1s; }
+.flower:nth-child(4n) { animation-delay: 1.5s; }
+.flower:nth-child(1) { top: 15%; left: 10%; transform: scale(0.8); }
+.flower:nth-child(2) { top: 70%; left: 20%; transform: scale(1.2); }
+.flower:nth-child(3) { top: 20%; left: 80%; transform: scale(1); }
+.flower:nth-child(4) { top: 80%; left: 75%; transform: scale(0.9); }
+.flower:nth-child(5) { top: 50%; left: 50%; transform: scale(0.7); animation-delay: 1.2s; }
+
+/* --- Diseño Principal de la App --- */
+.main-app { 
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+}
+.main-app.visible {
+    opacity: 1;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem 4rem; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.header-left { flex-grow: 1; }
+.header-right { display: flex; align-items: center; gap: 1rem; }
+
+/* --- Estilos de Títulos --- */
+.title, .welcome-title, .login-container .title { font-weight: 700; letter-spacing: 1px; }
+.welcome-title { font-size: 3.5rem; }
+.title { font-size: 2.5rem; }
+.login-container .title { font-size: 2rem; margin-bottom: 1.5rem; }
+.dark-mode .title, .dark-mode .welcome-title, .dark-mode .login-container .title { color: var(--neon-celeste); }
+.light-mode .title, .light-mode .welcome-title, .light-mode .login-container .title { color: var(--plomo-oscuro); }
+
+/* --- Botones de Header --- */
+.theme-toggle, .logout-btn { padding: 0.75rem; border: 1px solid; border-radius: 0.75rem; cursor: pointer; transition: all 0.3s ease; font-size: 1.25rem; background: transparent; }
+.dark-mode .theme-toggle, .dark-mode .logout-btn { color: var(--cyan-color); border-color: var(--border-dark); }
+.light-mode .theme-toggle, .light-mode .logout-btn { color: #64748b; border-color: var(--border-light); }
+
+/* --- Página de Login --- */
+body.login-page { display: flex; justify-content: center; align-items: center; }
+.login-container { background: rgba(15, 23, 42, 0.8); padding: 3rem; border-radius: 1rem; border: 1px solid var(--border-dark); box-shadow: 0 0 40px rgba(6, 182, 212, 0.2); width: 100%; max-width: 400px; text-align: center; }
+.form-group { margin-bottom: 1.5rem; text-align: left; }
+.form-group label { display: block; margin-bottom: 0.5rem; color: #94a3b8; }
+.form-control { width: 100%; padding: 0.6rem 1rem; border: 1px solid #334155; border-radius: 0.5rem; background: #1e293b; color: white; font-size: 0.9rem; }
+.btn { width: 100%; padding: 0.75rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer; background: linear-gradient(45deg, var(--primary-color), var(--cyan-color)); color: white; font-weight: 500; font-size: 1rem; transition: all 0.3s ease; }
+.btn:hover { box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35); }
+.alert { padding: 1rem; margin-bottom: 1.5rem; border-radius: 0.5rem; border: 1px solid transparent; text-align: left; }
+.alert-danger { background-color: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); color: #f87171; }
+.alert-warning { background-color: rgba(251, 191, 36, 0.2); border-color: rgba(251, 191, 36, 0.5); color: #fcd34d; }
+
+/* --- Pestañas y Contenido Principal --- */
+.tabs { display: flex; margin-bottom: 1.5rem; border-bottom: 1px solid; }
+.dark-mode .tabs { border-color: var(--border-dark); }
+.light-mode .tabs { border-color: var(--border-light); }
+.tab-btn { padding: 1rem 1.5rem; cursor: pointer; border: none; background: none; font-size: 1rem; font-weight: 500; transition: all 0.3s ease; border-bottom: 3px solid transparent; }
+.dark-mode .tab-btn { color: var(--text-light); }
+.light-mode .tab-btn { color: var(--text-dark); }
+.tab-btn.active { border-bottom-color: var(--primary-color); color: var(--primary-color); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.upload-section { margin-bottom: 2rem; padding: 1.5rem; border-radius: 0.75rem; border: 1px solid; }
+.dark-mode .upload-section { background: rgba(15, 23, 42, 0.5); border-color: var(--border-dark); }
+.light-mode .upload-section { background: var(--bg-light-2); border-color: var(--border-light); }
+.upload-controls { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.file-input { display: none; }
+.upload-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; border-radius: 0.5rem; cursor: pointer; background: linear-gradient(45deg, var(--primary-color), var(--cyan-color)); color: white; font-weight: 500; transition: all 0.3s ease; border: none; }
+.file-info { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem; font-size: 0.875rem; }
+.dark-mode .file-info { background: var(--bg-dark-2); border: 1px solid var(--border-dark); }
+.light-mode .file-info { background: var(--bg-light-1); border: 1px solid #cbd5e1; }
+.clear-btn { padding: 0.25rem; border: none; border-radius: 0.25rem; cursor: pointer; background: transparent; color: #ef4444; }
+.search-container { position: relative; margin-bottom: 2rem; }
+.search-input { width: 100%; padding: 1rem 4rem 1rem 1.5rem; border-radius: 0.75rem; font-size: 1.125rem; border: 1px solid; background: transparent; }
+.dark-mode .search-input { border-color: var(--border-dark); color: var(--text-light); }
+.light-mode .search-input { border-color: var(--border-light); color: var(--text-dark); }
+.search-btn { position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); padding: 0.6rem; border: none; border-radius: 0.5rem; cursor: pointer; background: linear-gradient(45deg, var(--primary-color), var(--cyan-color)); color: white; }
+.results-container { display: flex; flex-direction: column; gap: 1rem; }
+.result-item { padding: 1.5rem; border-radius: 0.75rem; border: 1px solid; transition: all 0.2s ease; }
+.dark-mode .result-item { background: rgba(15, 23, 42, 0.5); border-color: var(--border-dark); }
+.light-mode .result-item { background: var(--bg-light-2); border-color: var(--border-light); }
+.result-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+.result-details { font-size: 0.875rem; opacity: 0.8; }
+.status-text { font-size: 0.875rem; margin-top: 1rem; opacity: 0.7; }
+.loading, .no-results { text-align: center; padding: 3rem; }
+
+/* --- Animaciones (Keyframes) --- */
+@keyframes curtainFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes curtainFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes contentFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes appFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes growFlower { 
+    0% { transform: scale(0); opacity: 0; }
+    50% { opacity: 0.3; } /* Animación más transparente */
+    100% { transform: scale(1); opacity: 0; }
+}

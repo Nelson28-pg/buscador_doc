@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block body_class %}curtain-active{% endblock %}
+
+{% block content %}
+    <div class="welcome-curtain" id="welcomeCurtain">
+        <div class="flower-container">
+            <div class="flower"></div> <div class="flower"></div> <div class="flower"></div>
+            <div class="flower"></div> <div class="flower"></div>
+        </div>
+        <h1 class="welcome-title">BIENVENIDO, {{ user_name }}</h1>
+        <p class="welcome-subtitle" id="welcomeSubtitle"></p>
+    </div>
+
+    <div class="main-app" id="mainApp">
+        <div class="container">
+            <div class="header">
+                <div class="header-left"><h1 class="title">Buscador de Documentos</h1></div>
+                <div class="header-right">
+                    <button class="theme-toggle" id="themeToggle" title="Cambiar tema"><i class="fas fa-sun"></i></button>
+                    <a href="{{ url_for('auth.logout') }}" class="logout-btn" title="Cerrar Sesión"><i class="fas fa-sign-out-alt"></i></a>
+                </div>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="internal">Datos Internos</button>
+                <button class="tab-btn" data-tab="excel">Cargar Excel</button>
+            </div>
+
+            <div id="internal" class="tab-content active"></div>
+
+            <div id="excel" class="tab-content">
+                <div class="upload-section">
+                    <div class="upload-controls">
+                        <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls,.csv">
+                        <label for="fileInput" class="upload-btn"><i class="fas fa-upload"></i> Cargar Excel</label>
+                        <div id="fileInfo" class="file-info" style="display: none;">
+                            <i class="fas fa-file-excel"></i>
+                            <span id="fileName"></span>
+                            <button class="clear-btn" id="clearFile" title="Quitar archivo"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="status-text" id="statusText"></div>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Escribe tu búsqueda..." autocomplete="off">
+                <button class="search-btn" id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div id="resultsSection">
+                <div class="loading" id="loading" style="display: none;"><i class="fas fa-spinner fa-spin"></i> Buscando...</div>
+                <div class="results-container" id="resultsContainer"></div>
+                <div class="no-results" id="noResults" style="display: none;">No se encontraron resultados.</div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
