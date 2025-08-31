@@ -22,10 +22,12 @@ def create_app(config_name=None):
         config_name = os.environ.get('FLASK_CONFIG', 'development')
 
     # Se define 'static_folder' y 'template_folder' a nivel de aplicación para una gestión centralizada.
+    # Se añade static_url_path para asegurar que la URL de los archivos estáticos sea correcta.
     app = Flask(__name__, 
                 instance_relative_config=True,
                 template_folder='templates', 
-                static_folder='static')
+                static_folder='static',
+                static_url_path='/static') # Añadido para asegurar la ruta URL de los estáticos
     
     # Carga la configuración desde el objeto importado de config.py
     app.config.from_object(config[config_name])

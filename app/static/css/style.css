@@ -2,9 +2,9 @@
 
 /* --- Variables Globales de Diseño --- */
 :root {
-    --primary-color: #3b82f6;
+    --primary-color: #06c6e8;
     --secondary-color: #8b5cf6;
-    --cyan-color: #06b6d4;
+    --cyan-color: #05bedf;
     --neon-celeste: #00d9ff;
     --plomo-oscuro: #4a4a4a;
     --bg-dark-1: #1e293b;
@@ -171,8 +171,81 @@ body.login-page { display: flex; justify-content: center; align-items: center; }
 .dark-mode .search-input { border-color: var(--border-dark); color: var(--text-light); }
 .light-mode .search-input { border-color: var(--border-light); color: var(--text-dark); }
 .search-btn { position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); padding: 0.6rem; border: none; border-radius: 0.5rem; cursor: pointer; background: linear-gradient(45deg, var(--primary-color), var(--cyan-color)); color: white; }
-.results-container { display: flex; flex-direction: column; gap: 1rem; }
-.result-item { padding: 1.5rem; border-radius: 0.75rem; border: 1px solid; transition: all 0.2s ease; }
+.results-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Ajusta el tamaño mínimo para 2 columnas */
+    gap: 1.5rem; /* Espacio entre las tarjetas */
+    justify-content: center; /* Centra las tarjetas si no llenan todo el ancho */
+    padding: 1rem 0;
+}
+
+/* --- Estilos para la Tarjeta Giratoria --- */
+.flip-card {
+    background-color: transparent;
+    width: 100%;
+    height: 200px; /* Altura fija para las tarjetas */
+    perspective: 1000px; /* Para el efecto 3D */
+    border-radius: 0.75rem;
+    border: 1px solid;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.dark-mode .flip-card {
+    border-color: var(--border-dark);
+}
+
+.light-mode .flip-card {
+    border-color: var(--border-light);
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    border-radius: 0.75rem;
+}
+
+.flip-card.is-flipped .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden; /* Safari */
+    backface-visibility: hidden;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dark-mode .flip-card-front, .dark-mode .flip-card-back {
+    background: rgba(15, 23, 42, 0.5);
+}
+
+.light-mode .flip-card-front, .light-mode .flip-card-back {
+    background: var(--bg-light-2);
+}
+
+.flip-card-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(45deg, var(--primary-color), var(--cyan-color)); /* Fondo para el reverso */
+    color: white;
+}
+
+.flip-card-back p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
 .dark-mode .result-item { background: rgba(15, 23, 42, 0.5); border-color: var(--border-dark); }
 .light-mode .result-item { background: var(--bg-light-2); border-color: var(--border-light); }
 .result-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
@@ -183,10 +256,41 @@ body.login-page { display: flex; justify-content: center; align-items: center; }
 /* --- Animaciones (Keyframes) --- */
 @keyframes curtainFadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes curtainFadeOut { from { opacity: 1; } to { opacity: 0; } }
-@keyframes contentFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes contentFadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes appFadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes growFlower { 
     0% { transform: scale(0); opacity: 0; }
     50% { opacity: 0.3; } /* Animación más transparente */
     100% { transform: scale(1); opacity: 0; }
+}
+
+/* --- Estilos de personalización de la tarjeta --- */
+.flip-card-front .result-title {
+    margin-bottom: 0.5rem; /* Ajuste para la línea */
+}
+
+.modern-line {
+    width: 80%; /* No llega a los bordes laterales */
+    height: 2px;
+    background-color: var(--cyan-color); /* Color de la línea */
+    margin: 0.5rem auto 1rem auto; /* Centrar y dar margen */
+    border-radius: 1px;
+}
+
+.result-subtitle1 {
+    color: white; /* Primer subtítulo blanco */
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.result-subtitle2 {
+    margin-top: 1.5rem; /* Mayor margen de separación */
+    color: #ccc; /* Color humo (light grey) */
+    font-size: 0.85rem;
+}
+
+.highlighted-back-data {
+    font-weight: bold;
+    color: var(--neon-celeste); /* Resaltado para el último key del reverso */
+    font-size: 1rem;
 }

@@ -11,11 +11,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const welcomeSubtitle = document.getElementById('welcomeSubtitle');
         const setWelcomeMessage = () => {
             const hour = new Date().getHours();
-            let message = "Que tengas un grandioso día, suerte para encontrar los EEM que tal vez se quedaron en tu caja. Trabaja!";
+            let message = "Que tengas un grandioso día, y haya suerte para encontrar los EEM que tal vez se quedaron en tu caja. Suerte amigo!";
             if (hour >= 18) { // Después de las 6 PM
-                message = "Ya es hora de que alistes tus cosas para regresar a casa, porque a la última hora. Suerte con la búsqueda!";
+                message = "Ya es hora de alistar tus cosas para regresar a casa. ¿porque a la ultima hora? Suerte con la búsqueda!";
             } else if (hour >= 13) { // Entre la 1 PM y las 6 PM
-                message = "Despues del refrigerio espero que ahora si trabajes, y encuentres lo que buscas. Suerte!";
+                message = "Despues del almuerzo espero que ahora si trabajes, y puedas encuentrar lo que buscas. Suerte!";
             }
             
             // Formatea el mensaje para poner la primera parte en negrita
@@ -74,6 +74,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const loading = document.getElementById('loading');
     const resultsContainer = document.getElementById('resultsContainer');
     const noResults = document.getElementById('noResults');
+
+    // --- Modal de Detalles (Elementos y Eventos) ---
+    const detailsModalOverlay = document.getElementById('detailsModalOverlay');
+    const modalDataElement = document.getElementById('modalData');
+    const modalCloseBtn = detailsModalOverlay.querySelector('.modal-close-btn');
+
+    modalCloseBtn.addEventListener('click', () => {
+        detailsModalOverlay.style.display = 'none';
+    });
+
+    detailsModalOverlay.addEventListener('click', (event) => {
+        if (event.target === detailsModalOverlay) {
+            detailsModalOverlay.style.display = 'none';
+        }
+    });
+
+    const showDetailsModal = (data) => {
+        modalDataElement.textContent = JSON.stringify(data, null, 2); // Formato JSON legible
+        detailsModalOverlay.style.display = 'block';
+    };
 
     const toggleTheme = () => {
         isDarkMode = !isDarkMode;
@@ -165,21 +185,66 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Nueva función para crear una tarjeta de resultado giratoria
+    const createResultCard = (result) => {
+        const item = document.createElement('div');
+        item.className = 'flip-card';
+
+        const keys = Object.keys(result);
+
+        // Obtener los valores para el reverso de la tarjeta (indices [4], [7], [5])
+        const backData1 = keys[4] ? `${keys[2]}: ${result[keys[2]]}` : '';
+        const backData2 = keys[7] ? `${keys[5]}: ${result[keys[5]]}` : '';
+        const backData3 = keys[5] ? `${keys[8]}: ${result[keys[8]]}` : ''; // This is the one to highlight
+
+        // Contenido del frente de la tarjeta
+        const title = result[keys[0]] || 'Documento';
+        const subtitle1 = keys.length > 1 ? `${keys[1]}: ${result[keys[1]]}` : '';
+        const subtitle2 = keys.length > 4 ? `${result[keys[4]]}` : ''; // Only value, no field name
+
+        item.innerHTML = `
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <h3 class="result-title">${title}</h3>
+                    <div class="modern-line"></div> <!-- New line element -->
+                    <p class="result-subtitle1">${subtitle1}</p>
+                    <p class="result-subtitle2">${subtitle2}</p>
+                </div>
+                <div class="flip-card-back">
+                    <p>${backData1}</p>
+                    <p>${backData2}</p>
+                    <p class="highlighted-back-data">${backData3}</p>
+                </div>
+            </div>
+        `;
+
+        // Añadir evento de clic para girar la tarjeta
+        item.addEventListener('click', () => {
+            item.classList.toggle('is-flipped');
+        });
+
+        return item;
+    };
+
     const displayResults = (data) => {
         const { results } = data;
-        if (results.length === 0) { 
-            noResults.style.display = 'block'; 
-            return; 
+        resultsContainer.innerHTML = ''; // Limpiar resultados anteriores
+        if (results.length === 0) {
+            noResults.style.display = 'block';
+            return;
         }
 
+        // Ocultar mensaje de no resultados si hay resultados
+        noResults.style.display = 'none';
+
+        // Configurar resultsContainer para mostrar dos tarjetas por fila
+        resultsContainer.style.display = 'grid';
+        resultsContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))'; // Ajuste para 2 columnas
+        resultsContainer.style.gap = '20px'; // Espacio entre tarjetas
+
         results.forEach(result => {
-            const keys = Object.keys(result);
-            const title = result[keys[0]] || 'Documento';
-            const details = keys.slice(1).map(key => `${key}: ${result[key]}`).join(' | ');
-            const item = document.createElement('div');
-            item.className = 'result-item';
-            item.innerHTML = `<h3 class="result-title">${title}</h3><p class="result-details">${details}</p>`;
-            resultsContainer.appendChild(item);
+            const card = createResultCard(result);
+            resultsContainer.appendChild(card);
         });
     };
 

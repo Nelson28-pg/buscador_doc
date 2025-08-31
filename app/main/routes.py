@@ -3,7 +3,7 @@
 """
 Define las rutas principales de la aplicación (búsqueda, carga, etc.).
 """
-from flask import render_template, request, jsonify, send_file, session, current_app
+from flask import render_template, request, jsonify, send_file, session, current_app, make_response
 from functools import wraps
 from . import main_bp
 from app.auth.routes import login_required

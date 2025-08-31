@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <!-- app/templates/base.html -->
 <html lang="es">
 <head>
@@ -19,6 +19,17 @@
     
     <!-- El contenido principal de cada página se insertará aquí -->
     {% block content %}{% endblock %}
+
+    <!-- Modal de Detalles (Global) -->
+    <div class="modal-overlay" id="detailsModalOverlay" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close-btn">&times;</button>
+            <h3 class="modal-title">Detalles del Registro</h3>
+            <div class="modal-body">
+                <pre id="modalData"></pre>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts globales. El de la app principal se carga al final -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
