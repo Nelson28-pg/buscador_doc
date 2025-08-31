@@ -1,4 +1,4 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
 <!-- app/templates/base.html -->
 <html lang="es">
 <head>
@@ -13,20 +13,28 @@
     
     <!-- Bloque para añadir CSS o scripts adicionales en el head -->
     {% block head_extra %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
 </head>
 <!-- El body puede tener clases adicionales, como en la página de login -->
 <body class="dark-mode {% block body_class %}{% endblock %}" id="body">
-    
-    <!-- El contenido principal de cada página se insertará aquí -->
-    {% block content %}{% endblock %}
 
-    <!-- Modal de Detalles (Global) -->
-    <div class="modal-overlay" id="detailsModalOverlay" style="display: none;">
-        <div class="modal-content">
-            <button class="modal-close-btn">&times;</button>
-            <h3 class="modal-title">Detalles del Registro</h3>
-            <div class="modal-body">
-                <pre id="modalData"></pre>
+    <div id="welcomeCurtain" class="welcome-curtain">
+        <h1 class="welcome-title"></h1>
+        <p id="welcomeSubtitle" class="welcome-subtitle"></p>
+    </div>
+
+    <div id="mainApp" class="main-app">
+        <!-- El contenido principal de cada página se insertará aquí -->
+        {% block content %}{% endblock %}
+
+        <!-- Modal de Detalles (Global) -->
+        <div class="modal-overlay" id="detailsModalOverlay" style="display: none;">
+            <div class="modal-content">
+                <button class="modal-close-btn">&times;</button>
+                <h3 class="modal-title">Detalles del Registro</h3>
+                <div class="modal-body">
+                    <pre id="modalData"></pre>
+                </div>
             </div>
         </div>
     </div>

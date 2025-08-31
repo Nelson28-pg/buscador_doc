@@ -7,7 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const welcomeCurtain = document.getElementById('welcomeCurtain');
     const mainApp = document.getElementById('mainApp');
     
-    if (welcomeCurtain) {
+    // Check if it's the login page
+    if (document.body.classList.contains('login-page')) {
+        mainApp.classList.add('visible');
+        if (welcomeCurtain) {
+            welcomeCurtain.style.display = 'none'; // Hide welcome curtain immediately
+        }
+        document.body.style.overflow = 'auto'; // Ensure scroll is enabled
+    } else if (welcomeCurtain) {
         const welcomeSubtitle = document.getElementById('welcomeSubtitle');
         const setWelcomeMessage = () => {
             const hour = new Date().getHours();
@@ -249,13 +256,72 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Asignación de eventos
-    themeToggle.addEventListener('click', toggleTheme);
-    tabButtons.forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
-    fileInput.addEventListener('change', handleFileUpload);
-    clearFile.addEventListener('click', handleClearFile);
-    searchBtn.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSearch(); });
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
+    if (tabButtons) {
+        tabButtons.forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+    }
+    if (fileInput) {
+        fileInput.addEventListener('change', handleFileUpload);
+    }
+    if (clearFile) {
+        clearFile.addEventListener('click', handleClearFile);
+    }
+    if (searchBtn) {
+        searchBtn.addEventListener('click', handleSearch);
+    }
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSearch(); });
+    }
 
     // Estado inicial
     updateStatus();
+
+    // Anime.js animation for login page
+    const animationContainer = document.querySelector('.animation-container');
+    if (animationContainer) {
+        const dots = document.querySelectorAll('.dot');
+        const visibleDots = document.querySelectorAll('.dot.lock-visible, .dot.lock-arc');
+
+        // Oculta todos los puntos al inicio
+        anime.set(dots, { scale: 0, opacity: 0 });
+
+        // Define la secuencia de la animación
+        const timeline = anime.timeline({
+            // La animación se ejecuta una vez al cargar la página
+            loop: false,
+            autoplay: true,
+            easing: 'easeInOutQuad',
+        });
+
+        // Animación #1: Los puntos que formarán el candado aparecen
+        timeline.add({
+            targets: visibleDots,
+            scale: [0, 1],
+            opacity: [0, 1],
+            delay: anime.stagger(50), // Pequeño retraso para un efecto de "revelación"
+            duration: 800
+        })
+        // Animación #2: El cuerpo del candado se "construye"
+        .add({
+            targets: '.dot:not(.lock-arc)',
+            scale: [1.1, 1], // Un pequeño rebote
+            rotate: [0, 360],
+            delay: anime.stagger(100, {grid: [15, 15], from: 'center'}),
+            duration: 1000,
+            easing: 'easeOutElastic(1, .8)'
+        }, '-=500') // Comienza 500ms antes de que termine la animación anterior
+        // Animación #3: El arco del candado se "cierra" con un color diferente
+        .add({
+            targets: '.dot.lock-arc',
+            scale: [1, 1],
+            backgroundColor: [
+                'var(--secondary-color)',
+                'var(--cyan-color)'
+            ],
+            delay: anime.stagger(150),
+            duration: 500
+        }, '-=800'); // Comienza 800ms antes de que termine la animación anterior
+    }
 });
