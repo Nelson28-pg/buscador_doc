@@ -155,6 +155,7 @@ body.login-page {
     height: 500px; /* Altura fija para el contenedor */
     background-color: var(--bg-dark-2); /* Fondo del contenedor principal */
     border: 1px solid var(--border-dark); /* Added border */
+    border: 1px solid var(--border-dark); /* Added border */
 }
 
 .login-card-container::before {

@@ -53,7 +53,6 @@
         </div>
         <div class="right-panel">
             <h3>Iniciar Sesión</h3>
-            <h2></h2>
             
             <form id="loginForm" method="post" action="{{ url_for('auth.login') }}" style="width: 100%; max-width: 350px;">
                 <div class="form-group">
@@ -123,7 +122,7 @@
                         }
                         usernameInput.value = ''; // Clear inputs
                         passwordInput.value = '';
-                    }, 2000); // 2 seconds
+                    }, 1000); // 2 seconds
                 }
             } catch (error) {
                 console.error('Error during login:', error);

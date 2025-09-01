@@ -1,7 +1,7 @@
 // app/static/js/main.js
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURACIÓN ---
-    const WELCOME_CURTAIN_DURATION = 10000; // Duración en milisegundos
+    const WELCOME_CURTAIN_DURATION = 9000; // Duración en milisegundos
 
     // --- Lógica para la Cortina de Bienvenida ---
     const welcomeCurtain = document.getElementById('welcomeCurtain');
@@ -276,7 +276,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Estado inicial
-    updateStatus();
+    if (!document.body.classList.contains('login-page')) {
+        updateStatus();
+    }
 
     // Anime.js animation for login page
     const animationContainer = document.querySelector('.animation-container');
