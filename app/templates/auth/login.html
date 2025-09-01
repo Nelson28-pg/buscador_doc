@@ -10,47 +10,46 @@
 
 {% block content %}
     <div class="login-card-container">
-        <div class="left-panel">
+         <div class="left-panel">
             <div class="animation-container">
-                <div class="dot" style="grid-row: 5; grid-column: 5;"></div>
-                <div class="dot" style="grid-row: 5; grid-column: 6;"></div>
-                <div class="dot" style="grid-row: 5; grid-column: 7;"></div>
-                <div class="dot" style="grid-row: 5; grid-column: 8;"></div>
-                <div class="dot" style="grid-row: 5; grid-column: 9;"></div>
-                <div class="dot" style="grid-row: 5; grid-column: 10;"></div>
-                <div class="dot" style="grid-row: 5; grid-column: 11;"></div>
-                <div class="dot" style="grid-row: 6; grid-column: 5;"></div>
-                <div class="dot" style="grid-row: 6; grid-column: 11;"></div>
-                <div class="dot" style="grid-row: 7; grid-column: 5;"></div>
-                <div class="dot" style="grid-row: 7; grid-column: 11;"></div>
-                <div class="dot" style="grid-row: 8; grid-column: 5;"></div>
-                <div class="dot" style="grid-row: 8; grid-column: 11;"></div>
-                <div class="dot" style="grid-row: 9; grid-column: 5;"></div>
-                <div class="dot" style="grid-row: 9; grid-column: 11;"></div>
-                <div class="dot" style="grid-row: 10; grid-column: 5;"></div>
-                <div class="dot" style="grid-row: 10; grid-column: 11;"></div>
-                <div class="dot" style="grid-row: 11; grid-column: 5;"></div>
-                <div class="dot" style="grid-row: 11; grid-column: 6;"></div>
-                <div class="dot" style="grid-row: 11; grid-column: 7;"></div>
-                <div class="dot" style="grid-row: 11; grid-column: 8;"></div>
-                <div class="dot" style="grid-row: 11; grid-column: 9;"></div>
-                <div class="dot" style="grid-row: 11; grid-column: 10;"></div>
-                <div class="dot" style="grid-row: 11; grid-column: 11;"></div>
+                <!-- Anillos exteriores -->
+                <div class="outer-ring ring-1"></div>
+                <div class="outer-ring ring-2"></div>
+                <div class="outer-ring ring-3"></div>
 
-                <div class="dot lock-arc" style="grid-row: 4; grid-column: 5;"></div>
-                <div class="dot lock-arc" style="grid-row: 4; grid-column: 6;"></div>
-                <div class="dot lock-arc" style="grid-row: 4; grid-column: 7;"></div>
-                <div class="dot lock-arc" style="grid-row: 4; grid-column: 8;"></div>
-                <div class="dot lock-arc" style="grid-row: 4; grid-column: 9;"></div>
-                <div class="dot lock-arc" style="grid-row: 4; grid-column: 10;"></div>
-                <div class="dot lock-arc" style="grid-row: 4; grid-column: 11;"></div>
-                <div class="dot lock-arc" style="grid-row: 3; grid-column: 6;"></div>
-                <div class="dot lock-arc" style="grid-row: 3; grid-column: 7;"></div>
-                <div class="dot lock-arc" style="grid-row: 3; grid-column: 8;"></div>
-                <div class="dot lock-arc" style="grid-row: 3; grid-column: 9;"></div>
-                <div class="dot lock-arc" style="grid-row: 3; grid-column: 10;"></div>
+                <!-- Esfera central wireframe -->
+                <div class="sphere-container" id="sphereContainer">
+                    <!-- Líneas horizontales -->
+                    <div class="sphere-line sphere-line-horizontal"></div>
+                    <div class="sphere-line sphere-line-horizontal"></div>
+                    <div class="sphere-line sphere-line-horizontal"></div>
+                    <div class="sphere-line sphere-line-horizontal"></div>
+
+                    <!-- Líneas verticales -->
+                    <div class="sphere-line sphere-line-vertical"></div>
+                    <div class="sphere-line sphere-line-vertical"></div>
+                    <div class="sphere-line sphere-line-vertical"></div>
+                    <div class="sphere-line sphere-line-vertical"></div>
+                    <div class="sphere-line sphere-line-vertical"></div>
+                    <div class="sphere-line sphere-line-vertical"></div>
+                </div>
+
+                <!-- Partículas flotantes -->
+                <div class="floating-particles">
+                    <div class="particle particle-1"></div>
+                    <div class="particle particle-2"></div>
+                    <div class="particle particle-3"></div>
+                    <div class="particle particle-4"></div>
+                    <div class="particle particle-5"></div>
+                    <div class="particle particle-6"></div>
+                </div>
+            </div>
+
+            <div class="description">
+                Accede al sistema de búsqueda de documentos que devolvió el Banco de la Nación.
             </div>
         </div>
+        
         <div class="right-panel">
             <h3>Iniciar Sesión</h3>
             
@@ -95,8 +94,29 @@
                 const data = await response.json(); // Assuming backend returns JSON
 
                 if (response.ok) {
-                    // Successful login, redirect to main page
-                    window.location.href = data.redirect_url || '/';
+                    // Successful login, trigger welcome curtain animation and then redirect
+                    const welcomeCurtain = document.createElement('div');
+                    welcomeCurtain.className = 'welcome-curtain';
+                    welcomeCurtain.innerHTML = `
+                        <h1 class="welcome-title">Bienvenido</h1>
+                        <p class="welcome-subtitle">Cargando tu experiencia...</p>
+                    `;
+                    document.body.appendChild(welcomeCurtain);
+                    document.body.classList.add('curtain-active'); // Prevent scrolling
+
+                    // Wait for the fade-out animation to complete, then redirect
+                    welcomeCurtain.addEventListener('animationend', () => {
+                        if (welcomeCurtain.classList.contains('hide')) {
+                            // Only redirect after the fade-out animation
+                            window.location.href = data.redirect_url + '?from_login=true' || '/?from_login=true';
+                            document.body.classList.remove('curtain-active'); // Re-enable scrolling
+                        }
+                    });
+
+                    // Trigger fade-out after a short delay (e.g., 1.5 seconds for welcome message)
+                    setTimeout(() => {
+                        welcomeCurtain.classList.add('hide');
+                    }, 1500); // Show welcome message for 1.5 seconds
                 } else {
                     // Failed login
                     const errorMessage = data.message || 'Credenciales incorrectas.';
@@ -122,7 +142,7 @@
                         }
                         usernameInput.value = ''; // Clear inputs
                         passwordInput.value = '';
-                    }, 1000); // 2 seconds
+                    }, 2000); // 2 segundos para que el usuario vea el mensaje
                 }
             } catch (error) {
                 console.error('Error during login:', error);
@@ -132,5 +152,6 @@
                 form.parentNode.insertBefore(newAlert, form);
             }
         });
-    </script>
+
+        </script>
 {% endblock %}
