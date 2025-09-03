@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Back face data
         const backData1 = keys[2] ? `{ Exp. BN : ${result[keys[2]]} }` : '';
-        const backData2 = keys[6] ? `Oficio/carta : ${result[keys[6]]}` : '';
+        const backData2 = keys[6] ? `RSI / RI : ${result[keys[6]]}` : '';
         const backData3 = keys[8] ? `${result[keys[8]]}` : '';
 
 
