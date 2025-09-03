@@ -24,9 +24,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: absolute;
+            top: 30%;
+            transform: translateY(-50%);
         }
         h1 {
-            font-size: 3rem;
+            font-size: 4rem;
             color: #FFF;
             text-transform: uppercase;
             margin: 0;
@@ -34,7 +37,13 @@
         h2 {
             font-size: 1.5rem;
             color: #FFF;
-            margin-top: 20px; /* Margen de separación */
+            margin-top: 20px;
+            position: absolute;
+            top: calc(50vh + 2em);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            z-index: 2;
         }
         #matrix-canvas {
             position: absolute;
@@ -48,9 +57,9 @@
 </head>
 <body>
     <div class="content">
-        <h1>BIENVENIDO, {{ current_user.username if current_user else 'Usuario' }}</h1>
-        <h2 id="subtitle"></h2>
+        <h1>BIENVENIDO, {{ user_name }}</h1>
     </div>
+    <h2 id="subtitle"></h2>
     <canvas id="matrix-canvas"></canvas>
 
     <script>
@@ -66,11 +75,11 @@
         const minutes = now.getMinutes();
 
         if (hour >= 0 && hour < 14) {
-            subtitleElement.textContent = 'Espero que tengas un buen día,y puedas encontrar lo que buscas. Tal vez, se quedó en tu caja!';
+            subtitleElement.textContent = 'Espero que tengas un buen día,y puedas encontrar lo que buscas. Exitos, amigo!';
         } else if (hour >= 14 && (hour < 17 || (hour === 17 && minutes <= 50))) {
-            subtitleElement.textContent = 'Espero que después de ese rico almuerzo, puedas encontrar lo que buscas. Tal vez, se quedó en tu caja!';
+            subtitleElement.textContent = 'Después de ese rico almuerzo, no te pongas a dormir. Avanza, avanza!';
         } else {
-            subtitleElement.textContent = 'cc';
+            subtitleElement.textContent = 'Alista tus cosas para ir a casa, mañana continuamos. Porqué a última hora!';
         }
 
         // Lógica para la animación de Matrix
@@ -90,10 +99,10 @@
         }
 
         function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.02)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = 'rgba(0, 255, 0, 0.5)'; // Green text with transparency
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.3)'; // Green text with transparency
             ctx.font = fontSize + 'px arial';
 
             for (let i = 0; i < drops.length; i++) {
