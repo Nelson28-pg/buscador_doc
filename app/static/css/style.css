@@ -9,7 +9,7 @@
     --neon-celeste: #00d9ff;
     --plomo-oscuro: #313131;
     --bg-dark-1: #000001;
-    --bg-dark-2: #1d2530;
+    --bg-dark-2: #003843;
     --bg-dark-curtain: #0d1321; /* Fondo más oscuro para la cortina */
     --bg-light-1: #2e2e2e;
     --bg-light-2: #ffffff;
@@ -19,7 +19,8 @@
     --border-light: #e2e8f0;
     --flower-color-1: #8a5cf6d4;
     --flower-color-2: #3b82f6;
-    --bg-neon-dark-cyan: #003344;
+    --bg-neon-dark-cyan: #003644;
+    --bg-neon-dark2-cyan: #000f13;
 }
 
 /* --- Estilos Base --- */
@@ -36,7 +37,7 @@ body {
 }
 
 .dark-mode { 
-    background: linear-gradient(135deg, var(--bg-neon-dark-cyan), var(--bg-dark-2)); 
+    background-color: var(--bg-dark-2); 
     color: var(--text-light); 
 }
 
@@ -59,11 +60,6 @@ body.curtain-active {
     background: var(--bg-dark-curtain);
     z-index: 1000;
     opacity: 0;
-    pointer-events: none; /* Temporarily disable pointer events */
-    display: flex; /* Make it a flex container */
-    align-items: center;
-    justify-content: center;
-    text-align: center;
     animation: curtainFadeIn 0.5s ease-out forwards;
 }
 
@@ -74,7 +70,7 @@ body.curtain-active {
 .welcome-title {
     position: absolute;
     top: 15%;
-    left: 10%;
+    left: 10%;;
     width: 80%;
     z-index: 10;
     opacity: 0;
@@ -115,22 +111,13 @@ body.curtain-active {
 .flower:nth-child(4) { top: 80%; left: 75%; transform: scale(0.9); animation-delay: 1.2s; }
 
 /* --- Diseño Principal de la App --- */
-.main-app {
-    display: none; /* Hidden by default */
+.main-app { 
+    opacity: 0;
     transition: opacity 0.5s ease-in;
 }
-
 .main-app.visible {
     opacity: 1;
 }
-
-
-
-body.show-curtain .welcome-curtain {
-    display: block; /* Show curtain when body has show-curtain class */
-    animation: curtainFadeIn 0.5s ease-out forwards;
-}
-
 .container { max-width: 1200px; margin: 0 auto; padding: 2rem 4rem; }
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .header-left { flex-grow: 1; }
@@ -207,14 +194,12 @@ body.login-page {
     align-items: center;
     text-align: center;
     position: relative;
-    overflow: hidden; /* Ensure content is clipped within its boundaries */
 }
 
 .left-panel h2 {
     font-size: 2.5rem;
     font-weight: 700;
     margin: 0 0 10px;
-}
 }
 
 .left-panel p {
@@ -233,7 +218,6 @@ body.login-page {
     align-items: flex-start;
     background-color: var(--bg-dark-curtain); /* Fondo oscuro para el panel derecho */
     color: var(--text-light);
-    z-index: 1; /* Ensure right panel is above other elements */
 }
 
 .right-panel h3 {
@@ -450,7 +434,7 @@ input:-webkit-autofill:active {
 @keyframes wireframePulse {
     0%, 100% {
         border-color: #1bab2e; /* Darker, more lead-like gray */
-        box-shadow: 0 0 10px rgba(39, 238, 8, 0.3); /* Darker shadow */
+        box-shadow: 0 0 10px rgba(52, 139, 71, 0.3); /* Darker shadow */
         opacity: 0.6;
     }
     50% {
@@ -722,24 +706,97 @@ input:-webkit-autofill:active {
     }
 }
 
-/* Keyframe animations for welcome curtain and content */
-@keyframes curtainFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+
+
+/* --- Search Results & Flip Cards --- */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto; /* Center the grid */
 }
 
-@keyframes curtainFadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
+.flip-card {
+    background-color: transparent;
+    width: 100%;
+    height: 250px;
+    perspective: 1000px;
+    cursor: pointer;
 }
 
-@keyframes contentFadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
 }
 
-@keyframes growFlower {
-    0% { transform: scale(0); opacity: 0; }
-    50% { opacity: 1; }
-    100% { transform: scale(1.5); opacity: 0; }
+.flip-card.is-flipped .flip-card-inner {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    border: 1px solid var(--neon-celeste);
+    background-color: var(--bg-neon-dark2-cyan);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.flip-card-front {
+    color: var(--text-light);
+}
+
+.flip-card-back {
+    color: var(--text-light);
+    transform: rotateY(180deg);
+    gap: 1rem;
+}
+
+.result-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--neon-celeste);
+}
+
+.modern-line {
+    width: 80%;
+    height: 1px;
+    background: var(--neon-celeste);
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.result-subtitle1 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.result-subtitle2 {
+    font-size: 1rem;
+    color: #a0aec0; /* smoke color */
+}
+
+.highlighted-back-data {
+    font-weight: 600;
+    color: var(--neon-celeste);
+}
+
+@media (max-width: 768px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
 }

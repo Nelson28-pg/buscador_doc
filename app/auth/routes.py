@@ -46,6 +46,7 @@ def login():
             return render_template('auth/login.html')
         else:
             session['user'] = username
+            session['just_logged_in'] = True # Add this line
             if is_ajax:
                 return jsonify({'redirect_url': url_for('main.index')}), 200
             flash('Inicio de sesión exitoso.', 'success')

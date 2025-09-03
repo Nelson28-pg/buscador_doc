@@ -43,7 +43,7 @@ def create_app(config_name=None):
 
     # Registrar Blueprints (módulos de la aplicación)
     from .auth.routes import auth_bp
-    app.register_blueprint(auth_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')
 
     from .main.routes import main_bp
     app.register_blueprint(main_bp)

@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Búsqueda de Documentos - BN{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-color-light: #05bedf; /* Adjusted for better contrast on dark bg */
+        --primary-color-dark: #007bff;
+        --dark-bg: #1a1a1a;
+        --cyan-color: #05bedf;
+    }
+
+    body {
+        background-color: var(--dark-bg);
+        color: #fff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .search-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .search-title {
+        color: var(--cyan-color);
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .header-icons {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .icon-button {
+        background-color: rgba(0, 0, 0, 0.492);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color-light);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .icon-button:hover {
+        background-color: var(--cyan-color);
+        color: var(--dark-bg);
+        transform: scale(1.1);
+    }
+
+    .tab-navigation {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2.5rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .tab {
+        padding: 0.5rem 0;
+        color: #ccc;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+        position: relative;
+    }
+
+    .tab.active {
+        color: var(--cyan-color);
+    }
+
+    .tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background-color: var(--cyan-color);
+    }
+    
+    .tab.inactive {
+        color: var(--dark-bg);
+    }
+
+    .search-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .search-bar-container {
+        display: flex;
+        align-items: center;
+        flex-grow: 1;
+        background-color: rgba(0, 0, 0, 0.492);
+        border-radius: 30px;
+        padding: 0.5rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .search-bar-container:focus-within {
+        box-shadow: 0 0 10px rgba(5, 190, 223, 0.5);
+    }
+    
+    #searchInput {
+        flex-grow: 1;
+        border: none;
+        background: transparent;
+        color: #fff;
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+        outline: none;
+    }
+
+    #searchBtn {
+        border: none;
+        background-color: var(--cyan-color);
+        color: var(--dark-bg);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #searchBtn:hover {
+        background-color: #049db9;
+    }
+    
+    .results-grid {
+        margin-top: 3rem;
+    }
+    
+    .loader {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid var(--cyan-color);
+      width: 40px;
+      height: 40px;
+      -webkit-animation: spin 1s linear infinite; /* Safari */
+      animation: spin 1s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+</style>
+
+<div class="search-container">
+    <div class="header-top">
+        <h1 class="search-title">Buscador de Documentos</h1>
+        <div class="header-icons">
+            <!-- Icons removed as per user request -->
+        </div>
+    </div>
+    
+    <div class="tab-navigation">
+        <div class="tab active" onclick="activateTab(this)">Datos Internos</div>
+        <div class="tab inactive" onclick="activateTab(this)"></div>
+    </div>
+
+    <div class="search-section">
+        <div class="search-bar-container">
+            <input type="text" id="searchInput" placeholder="Búsqueda...">
+            <button id="searchBtn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+        </div>
+        <a href="{{ url_for('auth.logout') }}" class="icon-button" title="Salir">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+        </a>
+    </div>
+
+    
+
+    <div id="resultsContainer" class="results-grid">
+        <!-- Los resultados de la búsqueda aparecerán aquí -->
+    </div>
+    
+    <div id="noResults" style="display: none; text-align: center; margin-top: 2rem;">
+        <p>No se encontraron resultados.</p>
+    </div>
+
+    <div id="loading" style="display: none; text-align: center; margin-top: 2rem;">
+        <div class="loader"></div>
+    </div>
+</div>
+
+<script>
+    function activateTab(element) {
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => tab.classList.remove('active'));
+        element.classList.add('active');
+    }
+</script>
+{% endblock %}

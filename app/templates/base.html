@@ -9,19 +9,16 @@
     
     <!-- Enlaces a CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='1.0.0') }}">
     
     <!-- Bloque para añadir CSS o scripts adicionales en el head -->
     {% block head_extra %}{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
 </head>
 <!-- El body puede tener clases adicionales, como en la página de login -->
+</head>
+<!-- El body puede tener clases adicionales, como en la página de login -->
 <body class="dark-mode {% block body_class %}{% endblock %}" id="body">
-
-    <div id="welcomeCurtain" class="welcome-curtain">
-        <h1 class="welcome-title"></h1>
-        <p id="welcomeSubtitle" class="welcome-subtitle"></p>
-    </div>
 
     <div id="mainApp" class="main-app">
         <!-- El contenido principal de cada página se insertará aquí -->
@@ -40,6 +37,6 @@
     </div>
 
     <!-- Scripts globales. El de la app principal se carga al final -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js', v='1.0.0') }}"></script>
 </body>
 </html>

@@ -6,64 +6,81 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica para la Cortina de Bienvenida ---
     const welcomeCurtain = document.getElementById('welcomeCurtain');
     const mainApp = document.getElementById('mainApp');
-    
+
+    console.log('main.js loaded.');
+    console.log('welcomeCurtain element:', welcomeCurtain);
+    console.log('mainApp element:', mainApp);
+
     const urlParams = new URLSearchParams(window.location.search);
     const fromLogin = urlParams.get('from_login');
-    
+    console.log('from_login parameter:', fromLogin);
+
+    // Global function to start the welcome curtain animation
+    window.startWelcomeCurtainAnimation = () => {
+        if (welcomeCurtain) {
+            welcomeCurtain.style.display = 'flex'; // Asegurarse de que la cortina sea visible para la animación
+            document.body.classList.add('curtain-active'); // Prevent scrolling
+            const welcomeSubtitle = document.getElementById('welcomeSubtitle');
+            const setWelcomeMessage = () => {
+                const hour = new Date().getHours();
+                let message = "Que tengas un grandioso día, y haya suerte para encontrar los EEM que tal vez se quedaron en tu caja. Suerte amigo!";
+                if (hour >= 18) { // Después de las 6 PM
+                    message = "Ya es hora de alistar tus cosas para regresar a casa. ¿porque a la ultima hora? Suerte con la búsqueda!";
+                } else if (hour >= 13) { // Entre la 1 PM y las 6 PM
+                    message = "Despues del almuerzo espero que ahora si trabajes, y puedas encuentrar lo que buscas. Suerte!";
+                }
+                
+                const formatMessage = (msg) => {
+                    const commaIndex = msg.indexOf(',');
+                    const periodIndex = msg.indexOf('.');
+                    let splitIndex = -1;
+
+                    if (commaIndex !== -1 && periodIndex !== -1) {
+                        splitIndex = Math.min(commaIndex, periodIndex);
+                    } else if (commaIndex !== -1) {
+                        splitIndex = commaIndex;
+                    } else {
+                        splitIndex = periodIndex;
+                    }
+
+                    if (splitIndex !== -1) {
+                        const firstPart = msg.substring(0, splitIndex + 1);
+                        const restPart = msg.substring(splitIndex + 1);
+                        return `<strong>${firstPart}</strong>${restPart}`;
+                    }
+                    return `<strong>${msg}</strong>`;
+                };
+
+                if (welcomeSubtitle) welcomeSubtitle.innerHTML = formatMessage(message);
+            };
+
+            setWelcomeMessage();
+
+            setTimeout(() => {
+                welcomeCurtain.classList.add('hide');
+                welcomeCurtain.addEventListener('animationend', () => {
+                    welcomeCurtain.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                    document.body.classList.remove('curtain-active'); // Re-enable scrolling
+                    if (mainApp) mainApp.classList.add('visible');
+                }, { once: true });
+            }, WELCOME_CURTAIN_DURATION);
+        }
+    };
+
     if (fromLogin === 'true') {
+        console.log('Coming from login page. Hiding curtain and showing main app.');
         if (welcomeCurtain) {
             welcomeCurtain.style.display = 'none';
+            console.log('welcomeCurtain display set to none.');
         }
         if (mainApp) {
             mainApp.classList.add('visible');
+            console.log('mainApp class added visible.');
         }
         document.body.style.overflow = 'auto'; // Ensure scroll is enabled
     } else if (welcomeCurtain) {
-        welcomeCurtain.style.display = 'flex'; // Asegurarse de que la cortina sea visible para la animación
-        const welcomeSubtitle = document.getElementById('welcomeSubtitle');
-        const setWelcomeMessage = () => {
-            const hour = new Date().getHours();
-            let message = "Que tengas un grandioso día, y haya suerte para encontrar los EEM que tal vez se quedaron en tu caja. Suerte amigo!";
-            if (hour >= 18) { // Después de las 6 PM
-                message = "Ya es hora de alistar tus cosas para regresar a casa. ¿porque a la ultima hora? Suerte con la búsqueda!";
-            } else if (hour >= 13) { // Entre la 1 PM y las 6 PM
-                message = "Despues del almuerzo espero que ahora si trabajes, y puedas encuentrar lo que buscas. Suerte!";
-            }
-            
-            const formatMessage = (msg) => {
-                const commaIndex = msg.indexOf(',');
-                const periodIndex = msg.indexOf('.');
-                let splitIndex = -1;
-
-                if (commaIndex !== -1 && periodIndex !== -1) {
-                    splitIndex = Math.min(commaIndex, periodIndex);
-                } else if (commaIndex !== -1) {
-                    splitIndex = commaIndex;
-                } else {
-                    splitIndex = periodIndex;
-                }
-
-                if (splitIndex !== -1) {
-                    const firstPart = msg.substring(0, splitIndex + 1);
-                    const restPart = msg.substring(splitIndex + 1);
-                    return `<strong>${firstPart}</strong>${restPart}`;
-                }
-                return `<strong>${msg}</strong>`;
-            };
-
-            if (welcomeSubtitle) welcomeSubtitle.innerHTML = formatMessage(message);
-        };
-
-        setWelcomeMessage();
-
-        setTimeout(() => {
-            welcomeCurtain.classList.add('hide');
-            welcomeCurtain.addEventListener('animationend', () => {
-                welcomeCurtain.style.display = 'none';
-                document.body.style.overflow = 'auto';
-                if (mainApp) mainApp.classList.add('visible');
-            }, { once: true });
-        }, WELCOME_CURTAIN_DURATION);
+        window.startWelcomeCurtainAnimation(); // Start animation on non-login pages
     } else {
         if (mainApp) mainApp.classList.add('visible');
     }
@@ -223,13 +240,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const keys = Object.keys(result);
 
-        const backData1 = keys[4] ? `${keys[2]}: ${result[keys[2]]}` : '';
-        const backData2 = keys[7] ? `${keys[5]}: ${result[keys[5]]}` : '';
-        const backData3 = keys[5] ? `${keys[8]}: ${result[keys[8]]}` : '';
-
+        // Front face data
         const title = result[keys[0]] || 'Documento';
-        const subtitle1 = keys.length > 1 ? `${keys[1]}: ${result[keys[1]]}` : '';
+        const subtitle1 = keys.length > 1 ? `${result[keys[1]]}` : '';
         const subtitle2 = keys.length > 4 ? `${result[keys[4]]}` : '';
+
+        // Back face data
+        const backData1 = keys[2] ? `{ Exp. BN : ${result[keys[2]]} }` : '';
+        const backData2 = keys[6] ? `Oficio/carta : ${result[keys[6]]}` : '';
+        const backData3 = keys[8] ? `${result[keys[8]]}` : '';
+
 
         item.innerHTML = `
             <div class="flip-card-inner">
@@ -240,8 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <p class="result-subtitle2">${subtitle2}</p>
                 </div>
                 <div class="flip-card-back">
-                    <p>${backData1}</p>
-                    <p>${backData2}</p>
+                    <p class="back-data"><strong>${backData1}</strong></p>
+                    <p class="back-data">${backData2}</p>
                     <p class="highlighted-back-data">${backData3}</p>
                 </div>
             </div>
@@ -264,9 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         noResults.style.display = 'none';
-        resultsContainer.style.display = 'grid';
-        resultsContainer.style.gridTemplateColumns = 'repeat(auto-fit, minmax(300px, 1fr))';
-        resultsContainer.style.gap = '20px';
+        resultsContainer.className = 'results-grid';
 
         results.forEach(result => {
             const card = createResultCard(result);

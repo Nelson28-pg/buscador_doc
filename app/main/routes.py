@@ -68,7 +68,31 @@ def index():
     username = session.get('user')
     user_details = users.get(username, {})
     user_name = user_details.get('name', 'Usuario')
-    return render_template('main/index.html', user_name=user_name)
+    
+    show_welcome_curtain = False
+    if session.pop('just_logged_in', False):
+        show_welcome_curtain = True
+
+    if show_welcome_curtain:
+        current_hour = datetime.now().hour
+        if 0 <= current_hour <= 14:
+            subtitle_text = 'aa'
+        elif 14 < current_hour <= 17:
+            subtitle_text = 'bb'
+        else:
+            subtitle_text = 'cc'
+        return render_template('loading.html', user_name=user_name, subtitle_text=subtitle_text)
+    return render_template('main/search.html', user_name=user_name)
+
+@main_bp.route('/search_page')
+@login_required
+@nocache
+def search_page():
+    """Renderiza la página de búsqueda de documentos."""
+    username = session.get('user')
+    user_details = users.get(username, {})
+    user_name = user_details.get('name', 'Usuario')
+    return render_template('main/search.html', user_name=user_name)
 
 @main_bp.route('/upload', methods=['POST'])
 @login_required

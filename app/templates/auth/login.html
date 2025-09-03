@@ -94,29 +94,8 @@
                 const data = await response.json(); // Assuming backend returns JSON
 
                 if (response.ok) {
-                    // Successful login, trigger welcome curtain animation and then redirect
-                    const welcomeCurtain = document.createElement('div');
-                    welcomeCurtain.className = 'welcome-curtain';
-                    welcomeCurtain.innerHTML = `
-                        <h1 class="welcome-title">Bienvenido</h1>
-                        <p class="welcome-subtitle">Cargando tu experiencia...</p>
-                    `;
-                    document.body.appendChild(welcomeCurtain);
-                    document.body.classList.add('curtain-active'); // Prevent scrolling
-
-                    // Wait for the fade-out animation to complete, then redirect
-                    welcomeCurtain.addEventListener('animationend', () => {
-                        if (welcomeCurtain.classList.contains('hide')) {
-                            // Only redirect after the fade-out animation
-                            window.location.href = data.redirect_url + '?from_login=true' || '/?from_login=true';
-                            document.body.classList.remove('curtain-active'); // Re-enable scrolling
-                        }
-                    });
-
-                    // Trigger fade-out after a short delay (e.g., 1.5 seconds for welcome message)
-                    setTimeout(() => {
-                        welcomeCurtain.classList.add('hide');
-                    }, 1500); // Show welcome message for 1.5 seconds
+                    // Successful login, redirect to main page
+                    window.location.href = data.redirect_url || '/';
                 } else {
                     // Failed login
                     const errorMessage = data.message || 'Credenciales incorrectas.';
@@ -142,7 +121,7 @@
                         }
                         usernameInput.value = ''; // Clear inputs
                         passwordInput.value = '';
-                    }, 2000); // 2 segundos para que el usuario vea el mensaje
+                    }, 1000); // para modificar el tiempo de espera, cambiar este valor
                 }
             } catch (error) {
                 console.error('Error during login:', error);
@@ -152,6 +131,5 @@
                 form.parentNode.insertBefore(newAlert, form);
             }
         });
-
-        </script>
+    </script>
 {% endblock %}
