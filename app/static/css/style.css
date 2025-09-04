@@ -800,3 +800,164 @@ input:-webkit-autofill:active {
         grid-template-columns: 1fr;
     }
 }
+
+.view-toggle {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.view-toggle-btn {
+    background-color: rgba(0,0,0,0.2);
+    border: 1px solid var(--neon-celeste);
+    color: var(--primary-color-light);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.view-toggle-btn.active {
+    background-color: var(--cyan-color);
+    color: var(--dark-bg);
+}
+
+.table-view-container {
+    width: 100%;
+    max-height: 350px; /* Altura máxima para la tabla */
+    overflow-y: auto; /* Habilitar scroll vertical */
+}
+
+/* Estilos para la barra de scroll flotante */
+.table-view-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.table-view-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-view-container::-webkit-scrollbar-thumb {
+    background-color: rgba(5, 190, 223, 0.5); /* Color humo celeste */
+    border-radius: 20px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+.table-view {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table-view thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table-view thead th {
+    background-color: #000;
+    color: var(--cyan-color);
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: left;
+    font-size: 0.8rem;
+}
+
+.table-view tbody td {
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.75rem;
+}
+
+.table-view tbody tr:hover {
+    background-color: var(--bg-neon-dark2-cyan);
+}
+
+.table-view input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    padding: 0.5rem 0;
+    outline: none;
+    font-size: 0.75rem;
+}
+
+.edit-btn-icon, .save-btn-icon, .cancel-btn-icon {
+    background-color: rgba(0, 0, 0, 0.492);
+    border: 1px solid var(--neon-celeste);
+    color: var(--neon-celeste);
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.edit-btn-icon:hover, .save-btn-icon:hover, .cancel-btn-icon:hover {
+    background-color: #00ff88;
+    color: #000;
+}
+
+.table-view th:nth-child(1),
+.table-view td:nth-child(1) {
+    width: 5%; /* Ancho para la columna N° */
+}
+
+.table-view th:nth-child(2),
+.table-view td:nth-child(2) {
+    width: 10%; /* Ancho para CUSTODIA */
+}
+
+.table-view th:nth-child(3),
+.table-view td:nth-child(3) {
+    width: 15%; /* Ancho para EXP BN */
+}
+
+.table-view th:nth-child(4),
+.table-view td:nth-child(4) {
+    width: 40%; /* Ancho para OBLIGADO */
+}
+
+@media print {
+    body, .search-container {
+        background-color: #fff;
+        color: #000;
+    }
+
+    .header-top, .tab-navigation, .search-section, .view-toggle {
+        display: none;
+    }
+
+    .table-view-container {
+        max-height: none;
+        overflow-y: visible;
+    }
+
+    .table-view {
+        width: 100%;
+    }
+
+    .table-view thead {
+        position: static;
+    }
+
+    .table-view, .table-view th, .table-view td {
+        border: 1px solid #ddd;
+    }
+
+    .table-view th {
+        background-color: #f2f2f2;
+    }
+}

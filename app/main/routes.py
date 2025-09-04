@@ -178,6 +178,39 @@ def status():
         'sample_records': len(INTERNAL_DATA) # Usar INTERNAL_DATA aquí
     })
 
+
+@main_bp.route('/update_data', methods=['POST'])
+@login_required
+def update_data():
+    """Actualiza un campo de un registro en la base de datos interna."""
+    data = request.get_json()
+    exp_bn = data.get('exp_bn')
+    field = data.get('field')
+    value = data.get('value')
+
+    if not all([exp_bn, field]):
+        return jsonify({'success': False, 'error': 'Datos incompletos'}), 400
+
+    global INTERNAL_DATA
+    updated = False
+    for item in INTERNAL_DATA:
+        if item.get('EXP BN') == exp_bn:
+            item[field] = value
+            updated = True
+            break
+
+    if not updated:
+        return jsonify({'success': False, 'error': 'Documento no encontrado'}), 404
+
+    try:
+        with open(DATA_FILE_PATH, 'w', encoding='utf-8') as f:
+            json.dump(INTERNAL_DATA, f, indent=4, ensure_ascii=False)
+        logger.info(f"Dato actualizado en {DATA_FILE_PATH}: EXP BN={exp_bn}, campo={field}")
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error al escribir en {DATA_FILE_PATH}: {e}")
+        return jsonify({'success': False, 'error': 'Error al guardar los datos'}), 500
+
 # --- Funciones de Utilidad ---
 def allowed_file(filename):
     """Verifica si la extensión del archivo es permitida."""

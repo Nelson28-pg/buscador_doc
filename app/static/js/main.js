@@ -7,13 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const welcomeCurtain = document.getElementById('welcomeCurtain');
     const mainApp = document.getElementById('mainApp');
 
-    console.log('main.js loaded.');
-    console.log('welcomeCurtain element:', welcomeCurtain);
-    console.log('mainApp element:', mainApp);
-
     const urlParams = new URLSearchParams(window.location.search);
     const fromLogin = urlParams.get('from_login');
-    console.log('from_login parameter:', fromLogin);
 
     // Global function to start the welcome curtain animation
     window.startWelcomeCurtainAnimation = () => {
@@ -69,14 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     if (fromLogin === 'true') {
-        console.log('Coming from login page. Hiding curtain and showing main app.');
         if (welcomeCurtain) {
             welcomeCurtain.style.display = 'none';
-            console.log('welcomeCurtain display set to none.');
         }
         if (mainApp) {
             mainApp.classList.add('visible');
-            console.log('mainApp class added visible.');
         }
         document.body.style.overflow = 'auto'; // Ensure scroll is enabled
     } else if (welcomeCurtain) {
@@ -90,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeTab = 'internal';
     const body = document.getElementById('body');
     const themeToggle = document.getElementById('themeToggle');
-    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabButtons = document.querySelectorAll('.tab');
     const tabContents = document.querySelectorAll('.tab-content');
     const fileInput = document.getElementById('fileInput');
     const fileInfo = document.getElementById('fileInfo');
@@ -102,6 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const loading = document.getElementById('loading');
     const resultsContainer = document.getElementById('resultsContainer');
     const noResults = document.getElementById('noResults');
+    const tableViewBtn = document.getElementById('tableViewBtn');
+    const cardViewBtn = document.getElementById('cardViewBtn');
+    const tableView = document.getElementById('tableView');
+    const cardView = document.getElementById('cardView');
+    const tableHead = document.getElementById('tableHead');
+    const tableBody = document.getElementById('tableBody');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const printBtn = document.getElementById('printBtn');
 
     // --- Modal de Detalles (Elementos y Eventos) ---
     const detailsModalOverlay = document.getElementById('detailsModalOverlay');
@@ -149,6 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearResults = () => { 
         if (resultsContainer) resultsContainer.innerHTML = ''; 
         if (noResults) noResults.style.display = 'none'; 
+        if (tableBody) tableBody.innerHTML = '';
+        if (tableHead) tableHead.innerHTML = '';
     };
     const updateFileInfo = (filename) => {
         if (fileInfo) {
@@ -234,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const createResultCard = (result) => {
+    const renderCardView = (result) => {
         const item = document.createElement('div');
         item.className = 'flip-card';
 
@@ -274,23 +276,175 @@ document.addEventListener('DOMContentLoaded', () => {
         return item;
     };
 
+    const renderTableView = (results) => {
+        if (!tableBody || !tableHead) return;
+        tableHead.innerHTML = '';
+        tableBody.innerHTML = '';
+
+        if (results.length === 0) return;
+
+        const headersToShow = ['N°', 'CUSTODIA', 'EXP BN', 'OBLIGADO', 'UBICADO', 'Actions'];
+        const headerRow = document.createElement('tr');
+        headersToShow.forEach(header => {
+            const th = document.createElement('th');
+            th.textContent = header;
+            headerRow.appendChild(th);
+        });
+        tableHead.appendChild(headerRow);
+
+        results.forEach((item, index) => {
+            const row = document.createElement('tr');
+            row.setAttribute('data-exp-bn', item['EXP BN']);
+
+            headersToShow.forEach(header => {
+                const td = document.createElement('td');
+                if (header === 'N°') {
+                    td.textContent = index + 1;
+                } else if (header === 'Actions') {
+                    const editButton = document.createElement('button');
+                    editButton.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+                    editButton.className = 'edit-btn-icon';
+                    td.appendChild(editButton);
+
+                    const saveButton = document.createElement('button');
+                    saveButton.innerHTML = '<i class="fas fa-save"></i>';
+                    saveButton.className = 'save-btn-icon';
+                    saveButton.style.display = 'none';
+                    td.appendChild(saveButton);
+
+                    const cancelButton = document.createElement('button');
+                    cancelButton.innerHTML = '<i class="fas fa-times"></i>';
+                    cancelButton.className = 'cancel-btn-icon';
+                    cancelButton.style.display = 'none';
+                    td.appendChild(cancelButton);
+                } else {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = item[header] || '';
+                    input.setAttribute('data-field', header);
+                    input.readOnly = true;
+                    td.appendChild(input);
+                }
+                row.appendChild(td);
+            });
+            tableBody.appendChild(row);
+        });
+
+        tableBody.addEventListener('click', (e) => {
+            if (e.target.closest('.edit-btn-icon')) {
+                if (confirm('¿Desea editar este registro?')) {
+                    const row = e.target.closest('tr');
+                    row.querySelectorAll('input').forEach(input => input.readOnly = false);
+                    row.querySelector('.edit-btn-icon').style.display = 'none';
+                    row.querySelector('.save-btn-icon').style.display = 'inline-flex';
+                    row.querySelector('.cancel-btn-icon').style.display = 'inline-flex';
+                }
+            }
+
+            if (e.target.closest('.save-btn-icon')) {
+                const row = e.target.closest('tr');
+                const expBn = row.getAttribute('data-exp-bn');
+                row.querySelectorAll('input').forEach(input => {
+                    const field = input.getAttribute('data-field');
+                    const value = input.value;
+                    updateData(expBn, field, value);
+                });
+                row.querySelectorAll('input').forEach(input => input.readOnly = true);
+                row.querySelector('.edit-btn-icon').style.display = 'inline-flex';
+                row.querySelector('.save-btn-icon').style.display = 'none';
+                row.querySelector('.cancel-btn-icon').style.display = 'none';
+            }
+
+            if (e.target.closest('.cancel-btn-icon')) {
+                const row = e.target.closest('tr');
+                // This is a simple cancel, it does not revert to original values yet.
+                // A more complex implementation would store the original values before editing.
+                row.querySelectorAll('input').forEach(input => input.readOnly = true);
+                row.querySelector('.edit-btn-icon').style.display = 'inline-flex';
+                row.querySelector('.save-btn-icon').style.display = 'none';
+                row.querySelector('.cancel-btn-icon').style.display = 'none';
+            }
+        });
+    };
+
     const displayResults = (data) => {
-        if (!resultsContainer || !noResults) return;
+        if (!resultsContainer || !noResults || !tableBody) return;
         const { results } = data;
         resultsContainer.innerHTML = '';
+        tableBody.innerHTML = '';
+
         if (results.length === 0) {
             noResults.style.display = 'block';
             return;
         }
 
         noResults.style.display = 'none';
-        resultsContainer.className = 'results-grid';
-
         results.forEach(result => {
-            const card = createResultCard(result);
+            const card = renderCardView(result);
             resultsContainer.appendChild(card);
         });
+        renderTableView(results);
     };
+
+    const toggleViews = (view) => {
+        if (view === 'table') {
+            tableView.style.display = 'block';
+            cardView.style.display = 'none';
+            tableViewBtn.classList.add('active');
+            cardViewBtn.classList.remove('active');
+        } else {
+            tableView.style.display = 'none';
+            cardView.style.display = 'block';
+            cardViewBtn.classList.add('active');
+            tableViewBtn.classList.remove('active');
+        }
+    };
+
+    const updateData = async (exp_bn, field, value) => {
+        try {
+            const response = await fetch('/update_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ exp_bn, field, value })
+            });
+            const result = await response.json();
+            if (!result.success) {
+                throw new Error(result.error || 'Error desconocido al actualizar');
+            }
+        } catch (error) {
+            console.error('Error al actualizar los datos:', error);
+            alert(`Error al actualizar: ${error.message}`);
+        }
+    };
+
+    const downloadTable = () => {
+        const table = document.querySelector(".table-view");
+        let csv = [];
+        for (let i = 0; i < table.rows.length; i++) {
+            let row = [], cols = table.rows[i].querySelectorAll("td, th");
+            for (let j = 0; j < cols.length -1; j++) {
+                // Get the value from the input field if it exists, otherwise get the text content
+                let cell = cols[j].querySelector('input[type="text"]');
+                let text = cell ? cell.value : cols[j].innerText;
+                row.push('"' + text.replace(/"/g, '""') + '"');
+            }
+            csv.push(row.join(","));
+        }
+        let csvContent = "data:text/csv;charset=utf-8," + csv.join("\n");
+        let encodedUri = encodeURI(csvContent);
+        let link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "tabla_resultados.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    const printTable = () => {
+        window.print();
+    }
 
     if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
     if (tabButtons) tabButtons.forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
@@ -298,48 +452,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (clearFile) clearFile.addEventListener('click', handleClearFile);
     if (searchBtn) searchBtn.addEventListener('click', handleSearch);
     if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSearch(); });
+    if (tableViewBtn) tableViewBtn.addEventListener('click', () => toggleViews('table'));
+    if (cardViewBtn) cardViewBtn.addEventListener('click', () => toggleViews('card'));
+    if (downloadBtn) downloadBtn.addEventListener('click', downloadTable);
+    if (printBtn) printBtn.addEventListener('click', printTable);
 
     if (!document.body.classList.contains('login-page')) {
         updateStatus();
-    }
-
-    const animationContainer = document.querySelector('.animation-container');
-    if (animationContainer) {
-        const dots = document.querySelectorAll('.dot');
-        const visibleDots = document.querySelectorAll('.dot.lock-visible, .dot.lock-arc');
-
-        anime.set(dots, { scale: 0, opacity: 0 });
-
-        const timeline = anime.timeline({
-            loop: false,
-            autoplay: true,
-            easing: 'easeInOutQuad',
-        });
-
-        timeline.add({
-            targets: visibleDots,
-            scale: [0, 1],
-            opacity: [0, 1],
-            delay: anime.stagger(50),
-            duration: 800
-        })
-        .add({
-            targets: '.dot:not(.lock-arc)',
-            scale: [1.1, 1],
-            rotate: [0, 360],
-            delay: anime.stagger(100, {grid: [15, 15], from: 'center'}),
-            duration: 1000,
-            easing: 'easeOutElastic(1, .8)'
-        }, '-=500')
-        .add({
-            targets: '.dot.lock-arc',
-            scale: [1, 1],
-            backgroundColor: [
-                'var(--secondary-color)',
-                'var(--cyan-color)'
-            ],
-            delay: anime.stagger(150),
-            duration: 500
-        }, '-=800');
     }
 });

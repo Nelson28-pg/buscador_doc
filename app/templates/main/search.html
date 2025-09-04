@@ -91,10 +91,6 @@
         height: 2px;
         background-color: var(--cyan-color);
     }
-    
-    .tab.inactive {
-        color: var(--dark-bg);
-    }
 
     .search-section {
         display: flex;
@@ -183,8 +179,7 @@
     </div>
     
     <div class="tab-navigation">
-        <div class="tab active" onclick="activateTab(this)">Datos Internos</div>
-        <div class="tab inactive" onclick="activateTab(this)"></div>
+        <div class="tab active" data-tab="internal">Datos Internos</div>
     </div>
 
     <div class="search-section">
@@ -208,8 +203,30 @@
 
     
 
-    <div id="resultsContainer" class="results-grid">
-        <!-- Los resultados de la búsqueda aparecerán aquí -->
+    <div class="view-toggle">
+        <button id="tableViewBtn" class="view-toggle-btn active">Vista de Tabla</button>
+        <button id="cardViewBtn" class="view-toggle-btn">Vista de Tarjetas</button>
+        <button id="downloadBtn" class="view-toggle-btn">Descargar</button>
+        <button id="printBtn" class="view-toggle-btn">Imprimir</button>
+    </div>
+
+    <div id="tableView" style="display: block;">
+        <div class="table-view-container">
+            <table class="table-view">
+                <thead id="tableHead">
+                    <!-- Headers de la tabla aquí -->
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Resultados de la tabla aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="cardView" style="display: none;">
+        <div id="resultsContainer" class="results-grid">
+            <!-- Resultados de las tarjetas aquí -->
+        </div>
     </div>
     
     <div id="noResults" style="display: none; text-align: center; margin-top: 2rem;">
