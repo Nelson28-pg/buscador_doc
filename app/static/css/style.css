@@ -145,6 +145,9 @@ body.login-page {
     background: var(--bg-light-1); /* Solid smoke color */
 }
 
+
+
+
 .login-card-container {
     display: flex;
     width: 850px;
@@ -830,7 +833,7 @@ input:-webkit-autofill:active {
 
 /* Estilos para la barra de scroll flotante */
 .table-view-container::-webkit-scrollbar {
-    width: 8px;
+    width: 10px;
 }
 
 .table-view-container::-webkit-scrollbar-track {
@@ -912,22 +915,32 @@ input:-webkit-autofill:active {
 
 .table-view th:nth-child(1),
 .table-view td:nth-child(1) {
-    width: 5%; /* Ancho para la columna N° */
+    width: 3%; /* Ancho para la columna N° */
 }
 
 .table-view th:nth-child(2),
 .table-view td:nth-child(2) {
-    width: 10%; /* Ancho para CUSTODIA */
+    width: 6%; /* Ancho para CUSTODIA */
 }
 
 .table-view th:nth-child(3),
 .table-view td:nth-child(3) {
-    width: 15%; /* Ancho para EXP BN */
+    width: 11%; /* Ancho para EXP BN */
 }
 
 .table-view th:nth-child(4),
 .table-view td:nth-child(4) {
-    width: 40%; /* Ancho para OBLIGADO */
+    width: 21%; /* Ancho para EEM */
+}
+
+.table-view th:nth-child(5),
+.table-view td:nth-child(5) {
+    width: 33%; /* Ancho para OBLIGADO */
+}
+
+.table-view th:nth-child(6),
+.table-view td:nth-child(6) {
+    width: 12%; /* Ancho para UBICADO */
 }
 
 @media print {

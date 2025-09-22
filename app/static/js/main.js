@@ -95,9 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultsContainer = document.getElementById('resultsContainer');
     const noResults = document.getElementById('noResults');
     const tableViewBtn = document.getElementById('tableViewBtn');
-    const cardViewBtn = document.getElementById('cardViewBtn');
     const tableView = document.getElementById('tableView');
-    const cardView = document.getElementById('cardView');
     const tableHead = document.getElementById('tableHead');
     const tableBody = document.getElementById('tableBody');
     const downloadBtn = document.getElementById('downloadBtn');
@@ -236,46 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const renderCardView = (result) => {
-        const item = document.createElement('div');
-        item.className = 'flip-card';
-
-        const keys = Object.keys(result);
-
-        // Front face data
-        const title = result[keys[0]] || 'Documento';
-        const subtitle1 = keys.length > 1 ? `${result[keys[1]]}` : '';
-        const subtitle2 = keys.length > 4 ? `${result[keys[4]]}` : '';
-
-        // Back face data
-        const backData1 = keys[2] ? `{ Exp. BN : ${result[keys[2]]} }` : '';
-        const backData2 = keys[6] ? `RSI / RI : ${result[keys[6]]}` : '';
-        const backData3 = keys[8] ? `${result[keys[8]]}` : '';
-
-
-        item.innerHTML = `
-            <div class="flip-card-inner">
-                <div class="flip-card-front">
-                    <h3 class="result-title">${title}</h3>
-                    <div class="modern-line"></div>
-                    <p class="result-subtitle1">${subtitle1}</p>
-                    <p class="result-subtitle2">${subtitle2}</p>
-                </div>
-                <div class="flip-card-back">
-                    <p class="back-data"><strong>${backData1}</strong></p>
-                    <p class="back-data">${backData2}</p>
-                    <p class="highlighted-back-data">${backData3}</p>
-                </div>
-            </div>
-        `;
-
-        item.addEventListener('click', () => {
-            item.classList.toggle('is-flipped');
-        });
-
-        return item;
-    };
-
     const renderTableView = (results) => {
         if (!tableBody || !tableHead) return;
         tableHead.innerHTML = '';
@@ -283,11 +241,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (results.length === 0) return;
 
-        const headersToShow = ['N°', 'CUSTODIA', 'EXP BN', 'OBLIGADO', 'UBICADO', 'Actions'];
+        const headersToShow = ['N°', 'CUSTODIA', 'EXP BN', 'EEM', 'OBLIGADO', 'UBICADO', 'Actions'];
         const headerRow = document.createElement('tr');
         headersToShow.forEach(header => {
             const th = document.createElement('th');
             th.textContent = header;
+            if (header === 'OBLIGADO') {
+                th.classList.add('obligado-column');
+            }
             headerRow.appendChild(th);
         });
         tableHead.appendChild(headerRow);
@@ -298,6 +259,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             headersToShow.forEach(header => {
                 const td = document.createElement('td');
+                if (header === 'OBLIGADO') {
+                    td.classList.add('obligado-column');
+                }
                 if (header === 'N°') {
                     td.textContent = index + 1;
                 } else if (header === 'Actions') {
@@ -379,25 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         noResults.style.display = 'none';
-        results.forEach(result => {
-            const card = renderCardView(result);
-            resultsContainer.appendChild(card);
-        });
         renderTableView(results);
-    };
-
-    const toggleViews = (view) => {
-        if (view === 'table') {
-            tableView.style.display = 'block';
-            cardView.style.display = 'none';
-            tableViewBtn.classList.add('active');
-            cardViewBtn.classList.remove('active');
-        } else {
-            tableView.style.display = 'none';
-            cardView.style.display = 'block';
-            cardViewBtn.classList.add('active');
-            tableViewBtn.classList.remove('active');
-        }
     };
 
     const updateData = async (exp_bn, field, value) => {
@@ -452,8 +398,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (clearFile) clearFile.addEventListener('click', handleClearFile);
     if (searchBtn) searchBtn.addEventListener('click', handleSearch);
     if (searchInput) searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSearch(); });
-    if (tableViewBtn) tableViewBtn.addEventListener('click', () => toggleViews('table'));
-    if (cardViewBtn) cardViewBtn.addEventListener('click', () => toggleViews('card'));
     if (downloadBtn) downloadBtn.addEventListener('click', downloadTable);
     if (printBtn) printBtn.addEventListener('click', printTable);
 

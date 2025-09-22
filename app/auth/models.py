@@ -19,8 +19,16 @@ users = {
         "password": generate_password_hash("panchis4848"),
         "name": "Panchis"
     },
-    "invitado": {
-        "password": generate_password_hash("invitado4848"),
-        "name": "invitado"
+    "Ernesto": {
+        "password": generate_password_hash("ernesto4848"),
+        "name": "Ernesto"
+    },
+    "invitado1": {
+        "password": generate_password_hash("invitado14848"),
+        "name": "invitado1"
+    },
+    "invitado2": {
+        "password": generate_password_hash("invitado24848"),
+        "name": "invitado2"
     }
 }
